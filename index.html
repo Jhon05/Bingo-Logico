@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bingo lógico · Proposiciones y tablas de verdad</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(','\\)']],
+        displayMath: [['\\[','\\]']],
+        processEscapes: true,
+        packages: {'[+]': ['ams']}
+      },
+      svg: {fontCache: 'global'},
+      options: {skipHtmlTags: ['script','noscript','style','textarea','pre','code']}
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="scorm_api_wrapper.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <main class="app" id="app">
+    <section class="splash" id="splash">
+      <div class="splash-card">
+        <div class="splash-logo">
+          <span>∀</span><span>⊢</span><span>↔</span>
+        </div>
+        <p class="eyebrow">Práctica interactiva SCORM</p>
+        <h1>Bingo lógico</h1>
+        <p class="lead">Proposiciones, conectivos, tablas de verdad, traducción de enunciados, equivalencias, leyes de De Morgan, tautologías, contradicciones y contingencias.</p>
+        <div class="splash-actions">
+          <button class="btn primary huge" id="startFullscreenBtn">Entrar y activar pantalla completa</button>
+          <button class="btn ghost huge" id="howStartBtn">Cómo jugar</button>
+        </div>
+        <p class="small-note">En Brightspace se solicitará pantalla completa al iniciar, sin bloquear ni anular el intento si el navegador no lo permite.</p>
+      </div>
+    </section>
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">⊨</div>
+        <div>
+          <p class="eyebrow">Bingo lógico · práctica evaluativa</p>
+          <h1>Proposiciones y tablas de verdad</h1>
+        </div>
+      </div>
+      <div class="stats">
+        <div><span>Nota</span><strong id="gradeMini">0.0</strong><small>/5.0</small></div>
+        <div><span>Aciertos</span><strong id="correctMini">0</strong><small id="answeredMini">/0</small></div>
+        <div><span>Intentos</span><strong id="attemptsMini">0</strong></div>
+        <div><span>Banco</span><strong id="bankMini">10000</strong><small>preguntas</small></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn ghost" id="fullscreenBtn">Pantalla completa</button>
+        <button class="btn ghost" id="howBtn">Cómo jugar</button>
+        <button class="btn danger" id="finishBtn">Finalizar y enviar nota a Brightspace</button>
+      </div>
+    </header>
+
+    <section class="topics card">
+      <div>
+        <p class="eyebrow">Temas de evaluación</p>
+        <h2>El juego evalúa dos bloques de lógica proposicional</h2>
+      </div>
+      <div class="topic-grid">
+        <article>
+          <span class="topic-number">1</span>
+          <h3>Proposiciones, conectivos, tablas de verdad; traducción de enunciados</h3>
+          <p>Identificación de proposiciones, conectivos principales, interpretación de fórmulas y construcción de tablas.</p>
+        </article>
+        <article>
+          <span class="topic-number">2</span>
+          <h3>Equivalencias lógicas, De Morgan, tautología/contradicción/contingencia</h3>
+          <p>Uso de equivalencias, clasificación por tabla de verdad, leyes de De Morgan e implicación material.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="pattern-card card">
+      <div>
+        <p class="eyebrow">Objetivo del cartón</p>
+        <h2>Completa las tres unidades del cartón</h2>
+        <p class="muted">En cada partida se seleccionan tres figuras al azar. Cada figura completa equivale a una unidad. Si completas las tres unidades, el juego termina con nota 5.0.</p>
+      </div>
+      <div class="patterns" id="patterns"></div>
+    </section>
+
+    <section class="game-layout">
+      <aside class="machine card">
+        <div class="machine-head">
+          <div>
+            <p class="eyebrow">Balotera lógica</p>
+            <h2>Balota en movimiento</h2>
+          </div>
+          <span class="status-pill" id="statusPill">Listo</span>
+        </div>
+        <div class="bingo-machine">
+          <div class="cage" id="cage">
+            <div class="cage-ring ring-a"></div>
+            <div class="cage-ring ring-b"></div>
+            <div class="cage-ring ring-c"></div>
+            <div class="cage-axis"></div>
+            <div class="cage-balls" id="cageBalls"></div>
+          </div>
+          <div class="crank"><span></span></div>
+          <div class="base-board">
+            <div class="board-holes"></div>
+            <div class="board-label">BINGO</div>
+          </div>
+          <div class="tube"></div>
+          <div class="flying-ball hidden" id="flyingBall">B-7</div>
+        </div>
+        <div class="draw-box">
+          <div class="current-ball" id="currentBall">—</div>
+          <div>
+            <h3 id="currentTitle">Presiona “Sacar balota”</h3>
+            <p id="currentMeta">La balotera mezclará las balotas antes de liberar la pregunta.</p>
+          </div>
+        </div>
+        <button class="btn primary wide" id="drawBtn">Sacar balota y responder</button>
+      </aside>
+
+      <section class="board-card card">
+        <div class="board-head">
+          <div>
+            <p class="eyebrow">Cartón lógico</p>
+            <h2>Marca las casillas con tus aciertos</h2>
+          </div>
+          <div class="legend"><span></span> Casilla correcta</div>
+        </div>
+        <div class="bingo-board" id="board"></div>
+      </section>
+    </section>
+
+    <section class="report card hidden" id="reportPanel">
+      <div class="report-head">
+        <div>
+          <p class="eyebrow">Informe final</p>
+          <h2>Resultado de la práctica</h2>
+        </div>
+        <div class="final-grade"><span id="finalGrade">0.0</span><small>/5.0</small></div>
+      </div>
+      <div class="report-grid" id="reportGrid"></div>
+      <div class="report-actions">
+        <button class="btn ghost" id="downloadReportBtn">Descargar informe HTML</button>
+        <button class="btn ghost" id="downloadCsvBtn">Descargar CSV</button>
+        <button class="btn ghost" onclick="window.print()">Imprimir / guardar PDF</button>
+      </div>
+      <div class="table-wrap"><table class="report-table" id="reportTable"></table></div>
+    </section>
+  </main>
+
+  <dialog class="modal" id="howModal">
+    <div class="modal-card info-modal">
+      <button class="modal-close" data-close="howModal">×</button>
+      <p class="eyebrow">Instrucciones</p>
+      <h2>Cómo jugar</h2>
+      <ol>
+        <li>Presiona <b>Sacar balota y responder</b>. La balota sale de la balotera y activa una casilla del cartón.</li>
+        <li>Responde preguntas de opción múltiple, verdadero/falso, afirmaciones I–IV, traducción lógica o tablas de verdad.</li>
+        <li>Usa la pista cuando lo necesites. Cada pregunta registra intentos, tema, dificultad y resultado.</li>
+        <li>Completa las tres figuras aleatorias del cartón. Cada figura formada equivale a una unidad.</li>
+        <li>Cada respuesta correcta suma <b>0.2</b> y cada error resta <b>0.1</b>. La nota siempre queda entre <b>0.0</b> y <b>5.0</b>. El juego termina al completar las tres figuras, llegar a 5.0 o finalizar manualmente; en todos los casos se descarga el informe y se reporta la nota a Brightspace.</li>
+      </ol>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="questionModal">
+    <div class="modal-card question-card">
+      <button class="modal-close" id="closeQuestionBtn">×</button>
+      <div class="question-header">
+        <div>
+          <p class="eyebrow" id="qTopic">Tema</p>
+          <h2 id="qTitle">Pregunta</h2>
+        </div>
+        <div class="question-badges">
+          <span class="badge" id="qDifficulty">medio</span>
+          <span class="badge type" id="qType">opción múltiple</span>
+        </div>
+      </div>
+      <div class="question-prompt latex" id="qPrompt"></div>
+      <div id="qBody"></div>
+      <div class="hint-box hidden latex" id="hintBox"></div>
+      <div class="feedback hidden latex" id="feedbackBox"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="hintBtn">Ver pista</button>
+        <button class="btn primary" id="submitBtn">Responder</button>
+        <button class="btn ghost hidden" id="nextBtn">Continuar</button>
+      </div>
+    </div>
+  </dialog>
+</body>
+</html>
